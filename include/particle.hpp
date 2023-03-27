@@ -1,5 +1,7 @@
 #include <Eigen/Dense>
 
+using Eigen::Vector3d;
+
 // class Particle {
 //     public:
 //         Particle(double in_mass);
@@ -9,8 +11,9 @@
 //         double mass;
 // };
 
-namespace n_body 
-{
+// namespace n_body 
+// {
+
 class Particle{
     public:
         Particle(const Eigen::Vector3d& position, const Eigen::Vector3d& velocity, double mass);
@@ -18,9 +21,12 @@ class Particle{
         Eigen::Vector3d getPosition() const;
         Eigen::Vector3d getVelocity() const;
         Eigen::Vector3d getAcceleration() const;
-
         double getMass() const;
-        void update(double dt, const Eigen::Vector3d& acceleration);
+
+        void initialAcceleration (const Eigen::Vector3d& acceleration);
+        void uploadPosition(const Eigen::Vector3d &position);
+        void uploadVelocity(const Eigen::Vector3d &velocity);
+        void update(double dt);
 
     private:
         Eigen::Vector3d position_;
@@ -30,4 +36,4 @@ class Particle{
         double mass_;
 
 };
-}
+// }
