@@ -1,18 +1,10 @@
 #include <Eigen/Dense>
+#include <vector>
 
 using Eigen::Vector3d;
 
-// class Particle {
-//     public:
-//         Particle(double in_mass);
-//         double getMass() const;
-
-//     private:
-//         double mass;
-// };
-
-// namespace n_body 
-// {
+namespace n_body 
+{
 
 class Particle{
     public:
@@ -24,11 +16,11 @@ class Particle{
         double getMass() const;
 
         void initialAcceleration (const Eigen::Vector3d& acceleration);
-        void uploadPosition(const Eigen::Vector3d &position);
-        void uploadVelocity(const Eigen::Vector3d &velocity);
+        void uploadPosition(const Eigen::Vector3d& position);
+        void uploadVelocity(const Eigen::Vector3d& velocity);
         void update(double dt);
 
-    private:
+    protected:
         Eigen::Vector3d position_;
         Eigen::Vector3d velocity_;
         Eigen::Vector3d acceleration_;
@@ -36,4 +28,4 @@ class Particle{
         double mass_;
 
 };
-// }
+}

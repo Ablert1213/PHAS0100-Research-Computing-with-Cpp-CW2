@@ -11,8 +11,8 @@
 //     return mass;
 // }
 
-// namespace n_body 
-// {
+namespace n_body 
+{
 Particle::Particle(const Eigen::Vector3d& position, const Eigen::Vector3d& velocity, double mass)
     : position_ (position), velocity_ (velocity), mass_ (mass)
     {}
@@ -55,5 +55,4 @@ void Particle::update(double dt) {
 
 }
 
-
-// }
+}
