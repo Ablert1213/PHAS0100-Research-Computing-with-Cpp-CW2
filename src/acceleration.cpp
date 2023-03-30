@@ -1,5 +1,6 @@
 #include <Eigen/Dense>
 #include <vector>
+#include <iostream>
 #include "acceleration.hpp"
 
 using Eigen::Vector3d;
@@ -15,7 +16,7 @@ std::vector <n_body::particleAcceleration> particleAcceleration::getParticle (){
     return particle_list_;
 };
 
-Vector3d particleAcceleration::calcAcceleration (const Particle& p_i, const Particle& p_j, double epsilon){
+Vector3d particleAcceleration::calcAcceleration (const particleAcceleration& p_i, const particleAcceleration& p_j, double epsilon){
     
     Vector3d r = p_j.getPosition() - p_i.getPosition();
     double d_j_i = r.norm();
@@ -25,12 +26,15 @@ Vector3d particleAcceleration::calcAcceleration (const Particle& p_i, const Part
     return acceleration_j_i;
 };
 
-void particleAcceleration::sumAcceleration (std::vector<n_body::particleAcceleration> particles_list, double epsilon){
-    for (Particle &p_i : particles_list) {
+void particleAcceleration::sumAcceleration (std::vector<n_body::particleAcceleration> particles_list, const double epsilon){
+    for (particleAcceleration &p_i : particles_list) {
         Vector3d sumAcceleration_i = Vector3d::Zero();
-        for (const Particle &p_j : particles_list) {
+        for (const particleAcceleration &p_j : particles_list) {
             if (&p_i != &p_j) {
                 sumAcceleration_i += calcAcceleration(p_i, p_j, epsilon);
+            }
+            else{
+                continue;
             }
         }
         p_i.initialAcceleration(sumAcceleration_i);
