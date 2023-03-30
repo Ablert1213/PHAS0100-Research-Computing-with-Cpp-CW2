@@ -1,12 +1,15 @@
 #include <catch2/catch_test_macros.hpp>
+#include <catch2/catch_approx.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 // #include "particle.hpp"
-#include "acceleration.hpp"
+#include "systemSimulator.hpp"
+#include <Eigen/Dense>
+#include <vector>
 #include <iostream>
 
 using Catch::Matchers::WithinRel;
 using Eigen::Vector3d;
-
+using Catch::Approx;
 TEST_CASE("Particle with no acceleration should move at constant velocity", "[particle]") {
     Vector3d position(1, 2, 3);
     Vector3d velocity(4, 5, 6);
@@ -64,8 +67,8 @@ TEST_CASE("Particle with artificial acceleration should orbit in a circle", "[pa
 }
 
 TEST_CASE("Gravitational force between two particles", "[acceleration]") {
-    n_body::Particle p_i (Vector3d(0, 0, 0), Vector3d::Zero(), 1.0);
-    n_body::Particle p_j (Vector3d(1, 0, 0), Vector3d::Zero(), 1.0);
+    n_body::particleAcceleration p_i (Vector3d(0, 0, 0), Vector3d::Zero(), 1.0);
+    n_body::particleAcceleration p_j (Vector3d(1, 0, 0), Vector3d::Zero(), 1.0);
     double epsilon = 0.0;
 
     Vector3d expectAcc (1, 0, 0); // Calculate the expected acceleration by hand
@@ -104,5 +107,26 @@ TEST_CASE("Zero acceleration with equal particles on either side", "[acceleratio
 
     for (n_body::Particle &p_i : particle_list){
         REQUIRE(p_i.getAcceleration().isApprox(expectedAcceleration));
+    }
+}
+
+TEST_CASE("Solar System particles list Generator", "[generator]"){
+    std::vector <n_body::particleAcceleration> particle_list = n_body::sysSimulator::particleListGenerator ();
+    // Masses in order: Sun, Mercury, Venus, etc.
+    std::vector<double> masses = {1., 1. / 6023600, 1. / 408524, 1. / 332946.038, 1. / 3098710, 1. / 1047.55, 1. / 3499, 1. / 22962, 1. / 19352};
+    // Distances from Sun
+    std::vector<double> distances = {0.0, 0.4, 0.7, 1, 1.5, 5.2, 9.5, 19.2, 30.1};
+    // Check if the number of particles is correct
+    REQUIRE(particle_list.size() == masses.size());
+
+    for (int i = 0; i < particle_list.size(); ++i) {
+        // Check if the mass is correct
+        REQUIRE(particle_list[i].getMass() == Approx(masses[i]));
+
+        // Check if the distance from the Sun is correct (ignoring the Sun itself)
+        if (i > 0) {
+            double distance = (particle_list[i].getPosition() - particle_list[0].getPosition()).norm();
+            REQUIRE(distance == Approx(distances[i]));
+        }
     }
 }
