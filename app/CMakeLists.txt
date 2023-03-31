@@ -2,7 +2,7 @@ add_executable(solarSystemSimulator solarSystemSimulator.cpp)
 target_compile_features(solarSystemSimulator PUBLIC cxx_std_17)
 target_include_directories(solarSystemSimulator PUBLIC ../include)
 
-add_executable(solarSystemSimulator2 main.cpp)
+add_executable(solarSystemSimulator2 CalculateNumericalEnergyLoss.cpp)
 target_compile_features(solarSystemSimulator PUBLIC cxx_std_17)
 target_include_directories(solarSystemSimulator PUBLIC ../include)
 
