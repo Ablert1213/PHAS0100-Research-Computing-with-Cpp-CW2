@@ -48,10 +48,10 @@ void Particle::uploadVelocity(const Eigen::Vector3d &velocity) {
 
 void Particle::update(double dt) {
     position_ += dt * velocity_;
-    uploadPosition(position_);
-    acceleration_ = getAcceleration();
+    // uploadPosition(position_);
+    // acceleration_ = getAcceleration();
     velocity_ += dt * acceleration_;
-    uploadVelocity(velocity_);
+    // uploadVelocity(velocity_);
 
 }
 

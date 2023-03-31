@@ -18,23 +18,26 @@ std::vector <n_body::particleAcceleration> particleAcceleration::getParticle (){
 
 Vector3d particleAcceleration::calcAcceleration (const particleAcceleration& p_i, const particleAcceleration& p_j, double epsilon){
     
+    Vector3d acceleration_j_i = Vector3d::Zero();
     Vector3d r = p_j.getPosition() - p_i.getPosition();
-    double d_j_i = r.norm();
+    double d_j_i = (p_i.getPosition() - p_j.getPosition()).norm();
     double denominator = std::pow ((d_j_i * d_j_i + epsilon * epsilon), 3.0/2.0);
-    Vector3d acceleration_j_i = (p_j.getMass () * r) / denominator;
+    acceleration_j_i = (p_j.getMass () * r) / denominator;
 
     return acceleration_j_i;
 };
 
-void particleAcceleration::sumAcceleration (std::vector<n_body::particleAcceleration> particles_list, const double epsilon){
+void particleAcceleration::sumAcceleration (std::vector<n_body::particleAcceleration>& particles_list, const double epsilon){
     for (particleAcceleration &p_i : particles_list) {
         Vector3d sumAcceleration_i = Vector3d::Zero();
-        for (const particleAcceleration &p_j : particles_list) {
-            if (&p_i != &p_j) {
-                sumAcceleration_i += calcAcceleration(p_i, p_j, epsilon);
+        for (particleAcceleration &p_j : particles_list) {
+            if (&p_i != &p_j) { 
+                sumAcceleration_i += calcAcceleration(p_j, p_i, epsilon);
+                // std::cout<< sumAcceleration_i<< "000101"<< std::endl;
             }
             else{
                 continue;
+                // std::cout<< sumAcceleration_i<< "asdasd"<< std::endl;
             }
         }
         p_i.initialAcceleration(sumAcceleration_i);

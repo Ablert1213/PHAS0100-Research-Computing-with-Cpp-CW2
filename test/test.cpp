@@ -82,9 +82,9 @@ TEST_CASE("No acceleration when particle interacts with itself", "[acceleration]
     p1.addParticle(p2);
     
     Eigen::Vector3d expectedAcceleration = Eigen::Vector3d::Zero();
-    p1.sumAcceleration(p1.getParticle(), 1.0);
-
     std::vector <n_body::particleAcceleration> particle_list = p1.getParticle();
+
+    p1.sumAcceleration(particle_list, 1.0);
     Eigen::Vector3d calculatedAcceleration = n_body::particleAcceleration::calcAcceleration(p1, p1, 1.0);
 
     for (n_body::Particle &p_i : particle_list){
@@ -100,9 +100,9 @@ TEST_CASE("Zero acceleration with equal particles on either side", "[acceleratio
     p1.addParticle(p2);
     
     Eigen::Vector3d expectedAcceleration = Eigen::Vector3d::Zero();
-    p1.sumAcceleration(p1.getParticle(), 1.0);
-
     std::vector <n_body::particleAcceleration> particle_list = p1.getParticle();
+
+    p1.sumAcceleration(particle_list, 1.0);
     Eigen::Vector3d calculatedAcceleration = n_body::particleAcceleration::calcAcceleration(p1, p1, 1.0);
 
     for (n_body::Particle &p_i : particle_list){
