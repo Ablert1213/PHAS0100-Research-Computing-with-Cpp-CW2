@@ -83,4 +83,64 @@ void sysSimulator::printPosition (std::vector<particleAcceleration>& particle_li
         ++i;
     }
 }
+std::vector<double> sysSimulator::kineticEnergy (std::vector<particleAcceleration> particle_list) {
+    std::vector<double> kinetic_energy_list;
+    for (const n_body::particleAcceleration particle : particle_list){
+        double kin_energy = 0.0;
+        double mass = particle.getMass();
+        Eigen::Vector3d velocity = particle.getVelocity();
+        kin_energy = 0.5 * mass * velocity.squaredNorm();
+        kinetic_energy_list.push_back(kin_energy);
+    }
+    kinetic_energy_list_ = kinetic_energy_list;
+    return kinetic_energy_list_;
+}
+
+std::vector<double> sysSimulator::potentialEnergy (std::vector<particleAcceleration> particle_list) {
+    std::vector<double> potential_energy_list;
+    for (particleAcceleration &p_i : particle_list) {
+        // initial potential energy for each particle
+        double pot_energy = 0.0;
+        for (const particleAcceleration &p_j : particle_list) {
+            if (&p_i != &p_j) {
+                double mass_i = p_i.getMass();
+                double mass_j = p_j.getMass();
+                Eigen::Vector3d position_i = p_i.getPosition();
+                Eigen::Vector3d position_j = p_j.getPosition();
+                double dis_i_j = (position_i - position_j).norm();
+                pot_energy += -0.5 * (mass_i * mass_j) / dis_i_j;
+            }
+            else{
+                continue;
+            }
+        }
+        potential_energy_list.push_back(pot_energy);
+        
+    }
+    potential_energy_list_ = potential_energy_list;
+    return potential_energy_list_;
+}
+
+std::vector<double> sysSimulator::totalEnergy (){
+    std::vector<double> total_energy_list;
+    for (int i = 0; i < kinetic_energy_list_.size(); ++i){
+        double tot_energy = 0.0;
+        double kin_energy = kinetic_energy_list_[i];
+        double pot_energy = potential_energy_list_[i];
+        tot_energy = kin_energy + pot_energy;
+        total_energy_list.push_back(tot_energy);
+    }
+    total_energy_list_ = total_energy_list;
+    return total_energy_list_;
+}
+
+double sysSimulator::sumTotalEnergy (){
+    double sum_tot_energy = 0.0;
+    for (int i = 0; i < total_energy_list_.size(); ++i){
+        sum_tot_energy += total_energy_list_[i];
+    } 
+    sum_tot_energy_ = sum_tot_energy;
+    return sum_tot_energy_;
+}
+
 }

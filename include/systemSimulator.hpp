@@ -18,7 +18,25 @@ class sysSimulator{
         // add input data to the particle vector to calculate
         void addSysInput (std::vector<particleAcceleration>& particle_list);
 
+        // calculate the kinetic energy
+        std::vector<double> kineticEnergy (std::vector<particleAcceleration> particle_list);
+
+        // calculate the potential energy
+        std::vector<double> potentialEnergy (std::vector<particleAcceleration> particle_list);
+
+        // calculate the total energy of each particle
+        std::vector<double> totalEnergy ();
+
+        // calculate the sum of all individual particle energies
+        double sumTotalEnergy ();
+
         // print position value of particles in the list
         static void printPosition (std::vector<particleAcceleration>& particle_list, const std::string& label);
+
+    protected:
+        std::vector<double> kinetic_energy_list_;
+        std::vector<double> potential_energy_list_;
+        std::vector<double> total_energy_list_;
+        double sum_tot_energy_;
 };
 }
