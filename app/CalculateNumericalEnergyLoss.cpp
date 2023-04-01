@@ -1,5 +1,6 @@
 #include <iostream>
 #include <Eigen/Core>
+#include <chrono>
 #include "systemSimulator.hpp"
 
 int main(int argc, char* argv[]) {
@@ -28,11 +29,13 @@ int main(int argc, char* argv[]) {
 
         std::cout << "Inital Energy: " << std::endl;
         std::vector<std::string> planet {"sun", "Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune"};
-        for (int i = 0; i < total_energy_list.size(); ++i) {
-          std::cout << planet[i] << ": " << "kinetic energy: "<< kinetic_energy_list[i] << " potential energy: "<< potential_energy_list[i] << " total energy: "<< total_energy_list[i] << std::endl;
-        }
-
+        // for (int i = 0; i < total_energy_list.size(); ++i) {
+        //   std::cout << planet[i] << ": " << "kinetic energy: "<< kinetic_energy_list[i] << " potential energy: "<< potential_energy_list[i] << " total energy: "<< total_energy_list[i] << std::endl;
+        // }
         std::cout << "sum of total energy: " << sum_total_energy << std::endl;
+
+        // Start the timer
+        auto start_time = std::chrono::high_resolution_clock::now();
 
         for (int timestep = 0; timestep < tot_timestpes; ++timestep){
             // Update gravitational acceleration for all bodies
@@ -51,12 +54,22 @@ int main(int argc, char* argv[]) {
         std::vector<double> total_energy_list_final = simulator.totalEnergy();
         double sum_total_energy_final = simulator.sumTotalEnergy();
 
+        // End the timer
+        auto end_time = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double> elapsed_time = end_time - start_time;
+
+        // Calculate and print the total time and average time per timestep
+        double total_time = elapsed_time.count();
+        double avg_time_per_timestep = total_time / tot_timestpes;
+        std::cout << "\n" <<"Total time: " << total_time/60 << " mins" << std::endl;
+        std::cout << "Average time per timestep: " << avg_time_per_timestep << " seconds" << std::endl;
+
         std::cout << std::endl;
         std::cout << "Final Energy: " << std::endl;
         // std::vector<std::string> planet {"sun", "Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune"};
-        for (int i = 0; i < total_energy_list.size(); ++i) {
-          std::cout << planet[i] << ": " << "kinetic energy: "<< kinetic_energy_list_final[i] - kinetic_energy_list[i] << " potential energy: "<< potential_energy_list_final[i] << " total energy: "<< total_energy_list_final[i] << std::endl;
-        }
+        // for (int i = 0; i < total_energy_list.size(); ++i) {
+        //   std::cout << planet[i] << ": " << "kinetic energy: "<< kinetic_energy_list_final[i] - kinetic_energy_list[i] << " potential energy: "<< potential_energy_list_final[i] << " total energy: "<< total_energy_list_final[i] << std::endl;
+        // }
 
         std::cout << "sum of total energy: " << sum_total_energy_final << " total energy drop: " << 100 * (sum_total_energy_final - sum_total_energy)/sum_total_energy << "%" << std::endl;
 
