@@ -1,6 +1,7 @@
 #include <Eigen/Dense>
 #include <vector>
 #include <iostream>
+#include <random>
 #include "acceleration.hpp"
 #pragma once
 
@@ -49,6 +50,11 @@ public:
 class SolarSystemGenerator : public InitialConditionGenerator {
 public:
     std::vector<Particle> generateInitialConditions() override;
+};
+
+class RandomSystemGenerator : public InitialConditionGenerator {
+public:
+    std::vector<particleAcceleration> generateInitialConditions(const int num_particles = 100) override;
 };
 
 }

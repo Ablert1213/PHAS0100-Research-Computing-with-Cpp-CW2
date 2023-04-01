@@ -147,4 +147,36 @@ std::vector<Particle> SolarSystemGenerator::generateInitialConditions() override
     return solar_system;
 }
 
+std::vector<particleAcceleration> RandomSystemGenerator::generateInitialConditions(const int num_particles) override {
+    // Implement random initial conditions generation
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<double> mass_distribution(1.0 / 6000000, 1.0 / 1000);
+    std::uniform_real_distribution<double> distance_distribution(0.4, 30);
+    std::uniform_real_distribution<double> angle_distribution(0, 2 * M_PI);
+
+    std::vector<particleAcceleration> particles;
+
+    // Create the central star
+    particleAcceleration central_star(Vector3d::Zero(), Vector3d::Zero(), 1.0);
+    particles.push_back(central_star);
+
+    // Set the number of particles in the system
+    // Default num_particles = 100 adjust this value as needed
+
+    // Generate random particles
+    for (int i = 1; i <= num_particles; ++i) {
+        double mass_i = mass_distribution(gen);
+        double r_i = distance_distribution(gen);
+        double theta_i = angle_distribution(gen);
+
+        Vector3d position ((r_i * sin(theta_i)), (r_i * cos(theta_i)), 0.0);
+        Vector3d velocity ((-(1 / std::sqrt(r_i)) * cos(theta_i)), ((1 / std::sqrt(r_i)) * sin(theta_i)), 0.0);
+        particleAcceleration particle(position, velocity, mass_i);
+        particles.push_back(particle);
+    }
+
+    return particles;
+}
+
 }
