@@ -2,6 +2,7 @@
 #include <vector>
 #include <iostream>
 #include "acceleration.hpp"
+#pragma once
 
 using Eigen::Vector3d;
 
@@ -39,4 +40,12 @@ class sysSimulator{
         std::vector<double> total_energy_list_;
         double sum_tot_energy_;
 };
+
+class InitialConditionGenerator {
+public:
+    virtual std::vector<particleAcceleration> generateInitialConditions() = 0;
+};
+
+
+
 }
