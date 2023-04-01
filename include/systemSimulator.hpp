@@ -46,6 +46,9 @@ public:
     virtual std::vector<particleAcceleration> generateInitialConditions() = 0;
 };
 
-
+class SolarSystemGenerator : public InitialConditionGenerator {
+public:
+    std::vector<Particle> generateInitialConditions() override;
+};
 
 }
