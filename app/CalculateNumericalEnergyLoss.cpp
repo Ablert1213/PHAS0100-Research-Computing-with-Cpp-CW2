@@ -20,7 +20,8 @@ int main(int argc, char* argv[]) {
         double len_time = std::atof(argv[2]);
         double tot_timestpes = len_time * ((2 * M_PI)/dt);
 
-        n_body::sysSimulator simulator = n_body::sysSimulator();
+        n_body::sysSimulator simulator = n_body::sysSimulator(std::make_shared<n_body::SolarSystemGenerator>());
+        // n_body::sysSimulator simulator = n_body::sysSimulator();
         std::vector<n_body::particleAcceleration> particle_list = simulator.particleListGenerator();
         std::vector<double> kinetic_energy_list = simulator.kineticEnergy(particle_list);
         std::vector<double> potential_energy_list = simulator.potentialEnergy(particle_list);

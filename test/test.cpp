@@ -111,7 +111,10 @@ TEST_CASE("Zero acceleration with equal particles on either side", "[acceleratio
 }
 
 TEST_CASE("Solar System particles list Generator", "[generator]"){
-    std::vector <n_body::particleAcceleration> particle_list = n_body::sysSimulator::particleListGenerator ();
+    n_body::sysSimulator simulator = n_body::sysSimulator(std::make_shared<n_body::SolarSystemGenerator>());
+    std::vector<n_body::particleAcceleration> particle_list = simulator.particleListGenerator();
+    // std::vector <n_body::particleAcceleration> particle_list = n_body::sysSimulator::particleListGenerator ();
+    
     // Masses in order: Sun, Mercury, Venus, etc.
     std::vector<double> masses = {1., 1. / 6023600, 1. / 408524, 1. / 332946.038, 1. / 3098710, 1. / 1047.55, 1. / 3499, 1. / 22962, 1. / 19352};
     // Distances from Sun

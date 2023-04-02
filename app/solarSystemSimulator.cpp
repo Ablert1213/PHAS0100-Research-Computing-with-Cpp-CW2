@@ -19,7 +19,8 @@ int main(int argc, char* argv[]) {
         double len_time = std::atof(argv[2]);
         double tot_timestpes = len_time * (2 * M_PI / dt);
 
-        n_body::sysSimulator simulator = n_body::sysSimulator();
+        n_body::sysSimulator simulator = n_body::sysSimulator(std::make_shared<n_body::SolarSystemGenerator>());
+        // n_body::sysSimulator simulator = n_body::sysSimulator();
         std::vector<n_body::particleAcceleration> particle_list = simulator.particleListGenerator();
         simulator.printPosition (particle_list, "Initial");
 
@@ -30,7 +31,7 @@ int main(int argc, char* argv[]) {
           std::cout << planet[i] << ": "<< particle.getVelocity().transpose() << std::endl;
           ++i;
         }
-        
+
         for (int timestep = 0; timestep < tot_timestpes; ++timestep){
             // Update gravitational acceleration for all bodies
             for (n_body::particleAcceleration& p_i : particle_list){

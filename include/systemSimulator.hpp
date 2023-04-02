@@ -2,6 +2,9 @@
 #include <vector>
 #include <iostream>
 #include <random>
+#include <algorithm>
+#include <memory>
+#include <string>
 #include "acceleration.hpp"
 #pragma once
 
@@ -9,13 +12,33 @@ using Eigen::Vector3d;
 
 namespace n_body 
 {
+
+class InitialConditionGenerator {
+public:
+    virtual std::vector<particleAcceleration> generateInitialConditions() = 0;
+};
+
+class SolarSystemGenerator : public InitialConditionGenerator {
+public:
+    std::vector<particleAcceleration> generateInitialConditions() override;
+};
+
+class RandomSystemGenerator : public InitialConditionGenerator {
+public:
+    std::vector<particleAcceleration> generateInitialConditions() override;
+};
+
 class sysSimulator{
+    private:
+        std::shared_ptr<InitialConditionGenerator> generator;
+        // double epsilon;
     public:
         // construct inputs 
-        sysSimulator ();
-
+        // sysSimulator ();
+        sysSimulator (std::shared_ptr<InitialConditionGenerator> gen);
+        
         // create a list of particles corresponding to the major bodies within solar system with given initial conditions
-        static std::vector<particleAcceleration> particleListGenerator ();
+        std::vector<particleAcceleration> particleListGenerator ();
 
         // add input data to the particle vector to calculate
         void addSysInput (std::vector<particleAcceleration>& particle_list);
@@ -42,19 +65,6 @@ class sysSimulator{
         double sum_tot_energy_;
 };
 
-class InitialConditionGenerator {
-public:
-    virtual std::vector<particleAcceleration> generateInitialConditions() = 0;
-};
 
-class SolarSystemGenerator : public InitialConditionGenerator {
-public:
-    std::vector<Particle> generateInitialConditions() override;
-};
-
-class RandomSystemGenerator : public InitialConditionGenerator {
-public:
-    std::vector<particleAcceleration> generateInitialConditions(const int num_particles = 100) override;
-};
 
 }
