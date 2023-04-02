@@ -48,6 +48,8 @@ std::vector<particleAcceleration> SolarSystemGenerator::generateInitialCondition
     return solar_system;
 }
 
+RandomSystemGenerator::RandomSystemGenerator(int seed, int num_particles): seed(seed), num_particles(num_particles) {}
+
 std::vector<particleAcceleration> RandomSystemGenerator::generateInitialConditions() {
     // Implement random initial conditions generation
     std::mt19937 gen(seed);
@@ -61,9 +63,11 @@ std::vector<particleAcceleration> RandomSystemGenerator::generateInitialConditio
     particleAcceleration central_star(Vector3d::Zero(), Vector3d::Zero(), 1.0);
     particles.push_back(central_star);
 
-    // Set the number of particles in the system
-    // Default num_particles = 100 adjust this value as needed
-    int num_particles = 100;
+    // // Set the number of particles in the system
+    // // Default num_particles = 100 adjust this value as needed
+    // int num_particles = 100;
+    std::cout << "\n" << "test: "<<seed << " "<< num_particles << std::endl;
+
 
     // Generate random particles
     for (int i = 1; i <= num_particles; ++i) {
