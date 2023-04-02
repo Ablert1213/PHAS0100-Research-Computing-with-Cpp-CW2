@@ -50,8 +50,7 @@ std::vector<particleAcceleration> SolarSystemGenerator::generateInitialCondition
 
 std::vector<particleAcceleration> RandomSystemGenerator::generateInitialConditions() {
     // Implement random initial conditions generation
-    std::random_device rd;
-    std::mt19937 gen(rd());
+    std::mt19937 gen(seed);
     std::uniform_real_distribution<double> mass_distribution(1.0 / 6000000, 1.0 / 1000);
     std::uniform_real_distribution<double> distance_distribution(0.4, 30);
     std::uniform_real_distribution<double> angle_distribution(0, 2 * M_PI);

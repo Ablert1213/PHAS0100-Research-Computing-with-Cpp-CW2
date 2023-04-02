@@ -24,7 +24,10 @@ public:
 };
 
 class RandomSystemGenerator : public InitialConditionGenerator {
+private:
+    int seed;
 public:
+    RandomSystemGenerator(int seed = 42) : seed(seed) {} // Default seed is 42, but it can be fixed by developer to a particular value when appropriate
     std::vector<particleAcceleration> generateInitialConditions() override;
 };
 
