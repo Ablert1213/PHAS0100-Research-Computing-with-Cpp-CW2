@@ -2,6 +2,7 @@
 #include <vector>
 #include <iostream>
 #include "acceleration.hpp"
+#include <omp.h>
 
 using Eigen::Vector3d;
 
@@ -32,7 +33,8 @@ Vector3d particleAcceleration::calcAcceleration (const particleAcceleration* p_i
 void particleAcceleration::sumAcceleration (std::vector<n_body::particleAcceleration*> particles_list, const double& epsilon){
 
     Vector3d sumAcceleration_i = Vector3d::Zero();
-
+    // #pragma omp declare reduction (+: Eigen::Vector3d: omp_out += omp_in) initializer(omp_priv=Eigen::Vector3d::Zero())
+    // #pragma omp parallel for schedule(dynamic) reduction(+:sumAcceleration_i)
     for (particleAcceleration* p_i : particles_list) {
         if (p_i != this) {
             Vector3d acceleration_i = calcAcceleration(this, p_i, epsilon);

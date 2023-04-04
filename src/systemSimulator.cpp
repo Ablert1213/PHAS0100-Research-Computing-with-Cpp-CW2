@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <memory>
 #include <string>
+#include <omp.h>
 
 
 #include "systemSimulator.hpp"
@@ -96,6 +97,7 @@ std::vector<particleAcceleration> sysSimulator::particleListGenerator (){
 
 void sysSimulator::addSysInput (std::vector<particleAcceleration>& particle_list) {
 
+    #pragma omp parallel for schedule(dynamic) collapse(1)
     for (particleAcceleration& p_i : particle_list) {
         for (particleAcceleration& p_j : particle_list) {
             if (&p_i != &p_j) {
@@ -175,6 +177,7 @@ std::vector<double> sysSimulator::totalEnergy (){
 
 double sysSimulator::sumTotalEnergy (){
     double sum_tot_energy = 0.0;
+    // #pragma omp parallel for reduction(+:sum_tot_energy)
     for (int i = 0; i < total_energy_list_.size(); ++i){
         sum_tot_energy += total_energy_list_[i];
     } 
