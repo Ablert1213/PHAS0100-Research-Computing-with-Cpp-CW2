@@ -24,13 +24,13 @@ int main(int argc, char* argv[]) {
         std::vector<n_body::particleAcceleration> particle_list = simulator.particleListGenerator();
         simulator.printPosition (particle_list, "Initial");
 
-        std::vector<std::string> planet {"sun", "Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune"};
-        int i = 0;
-        std::cout << "\n" << "velocity: " << std::endl;
-        for (const n_body::particleAcceleration particle : particle_list) {
-          std::cout << planet[i] << ": "<< particle.getVelocity().transpose() << std::endl;
-          ++i;
-        }
+        // std::vector<std::string> planet {"sun", "Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune"};
+        // int i = 0;
+        // std::cout << "\n" << "velocity: " << std::endl;
+        // for (const n_body::particleAcceleration particle : particle_list) {
+        //   std::cout << planet[i] << ": "<< particle.getVelocity().transpose() << std::endl;
+        //   ++i;
+        // }
 
         std::vector<n_body::particleAcceleration*> particle_ptr_list;
         for (auto& p : particle_list) {
@@ -50,12 +50,12 @@ int main(int argc, char* argv[]) {
         }
         std::cout << "\n" << std::endl;
         simulator.printPosition (particle_list, "Final");
-        int idx = 0;
-        std::cout << "\n" << "velocity: " << std::endl;
-        for (const n_body::particleAcceleration particle : particle_list) {
-          std::cout << planet[idx] << ": "<< particle.getVelocity().transpose() << std::endl;
-          ++idx;
-        }
+        // int idx = 0;
+        // std::cout << "\n" << "velocity: " << std::endl;
+        // for (const n_body::particleAcceleration particle : particle_list) {
+        //   std::cout << planet[idx] << ": "<< particle.getVelocity().transpose() << std::endl;
+        //   ++idx;
+        // }
     }
 
 }

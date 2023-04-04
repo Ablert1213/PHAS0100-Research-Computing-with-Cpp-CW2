@@ -1,6 +1,5 @@
 #include "particle.hpp"
 #include <Eigen/Core>
-
 #include <iostream>
 
 namespace n_body 
@@ -43,5 +42,4 @@ void Particle::update(double& dt) {
     velocity_ += dt * acceleration_;
 
 }
-
 }
