@@ -53,11 +53,17 @@ class sysSimulator{
         // calculate the potential energy
         std::vector<double> potentialEnergy (std::vector<particleAcceleration>& particle_list);
 
+        // calculate the potential energy and parallelise the calculation using OpenMp
+        std::vector<double> potentialEnergyPara(std::vector<particleAcceleration>& particle_list); 
+
         // calculate the total energy of each particle
         std::vector<double> totalEnergy ();
 
         // calculate the sum of all individual particle energies
         double sumTotalEnergy ();
+
+        // calculate the sum of all individual particle energies and parallelise the calculation using OpenMp
+        double sumTotalEnergyPara ();    
 
         // print position value of particles in the list
         static void printPosition (std::vector<particleAcceleration>& particle_list, const std::string& label);

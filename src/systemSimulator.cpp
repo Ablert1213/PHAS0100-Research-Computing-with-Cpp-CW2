@@ -162,6 +162,38 @@ std::vector<double> sysSimulator::potentialEnergy (std::vector<particleAccelerat
     return potential_energy_list_;
 }
 
+std::vector<double> sysSimulator::potentialEnergyPara(std::vector<particleAcceleration>& particle_list) {
+    std::vector<double> potential_energy_list(particle_list.size(), 0.0);
+
+    #pragma omp parallel
+    {
+        std::vector<double> local_potential_energy_list(particle_list.size(), 0.0);
+
+        #pragma omp for
+        for (int i = 0; i < particle_list.size(); ++i) {
+            for (int j = 0; j < particle_list.size(); ++j) {
+                if (i != j) {
+                    double mass_i = particle_list[i].getMass();
+                    double mass_j = particle_list[j].getMass();
+                    Eigen::Vector3d position_i = particle_list[i].getPosition();
+                    Eigen::Vector3d position_j = particle_list[j].getPosition();
+                    double dis_i_j = (position_i - position_j).norm();
+                    local_potential_energy_list[i] += -0.5 * (mass_i * mass_j) / dis_i_j;
+                }
+            }
+        }
+
+        #pragma omp critical
+        for (int i = 0; i < particle_list.size(); ++i) {
+            potential_energy_list[i] += local_potential_energy_list[i];
+        }
+    }
+
+    potential_energy_list_ = potential_energy_list;
+    return potential_energy_list_;
+}
+
+
 std::vector<double> sysSimulator::totalEnergy (){
     std::vector<double> total_energy_list;
     for (int i = 0; i < kinetic_energy_list_.size(); ++i){
@@ -177,7 +209,16 @@ std::vector<double> sysSimulator::totalEnergy (){
 
 double sysSimulator::sumTotalEnergy (){
     double sum_tot_energy = 0.0;
-    // #pragma omp parallel for reduction(+:sum_tot_energy)
+    for (int i = 0; i < total_energy_list_.size(); ++i){
+        sum_tot_energy += total_energy_list_[i];
+    } 
+    sum_tot_energy_ = sum_tot_energy;
+    return sum_tot_energy_;
+}
+
+double sysSimulator::sumTotalEnergyPara (){
+    double sum_tot_energy = 0.0;
+    #pragma omp parallel for reduction(+:sum_tot_energy)
     for (int i = 0; i < total_energy_list_.size(); ++i){
         sum_tot_energy += total_energy_list_[i];
     } 
