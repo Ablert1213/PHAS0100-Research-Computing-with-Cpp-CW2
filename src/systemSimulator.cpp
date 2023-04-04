@@ -19,8 +19,9 @@ std::vector<particleAcceleration> SolarSystemGenerator::generateInitialCondition
     std::vector<double> masses = {1., 1./6023600, 1./408524, 1./332946.038, 1./3098710, 1./1047.55, 1./3499, 1./22962, 1./19352};
     std::vector<double> distances = {0.0, 0.4, 0.7, 1, 1.5, 5.2, 9.5, 19.2, 30.1};
     // generates random angle sigma for each of the planets 
-    std::random_device rd;
-    std::mt19937 gen(rd());
+    // std::random_device rd;
+    int seed = 42; // have a fixed seed value that allows to reproduce results consistently
+    std::mt19937 gen(seed);
     std::uniform_real_distribution<double> randomly_theta (0, 2 * M_PI);
     
     std::vector<particleAcceleration> solar_system;
@@ -30,7 +31,8 @@ std::vector<particleAcceleration> SolarSystemGenerator::generateInitialCondition
         if (i == 0) {
             Vector3d position = Vector3d::Zero();
             Vector3d velocity = Vector3d::Zero();
-            particleAcceleration planet_i = particleAcceleration (position, velocity, 1.0);
+            double mass_sun = 1.0;
+            particleAcceleration planet_i = particleAcceleration (position, velocity, mass_sun);
             solar_system.push_back(planet_i);
         }
         else{
@@ -60,14 +62,9 @@ std::vector<particleAcceleration> RandomSystemGenerator::generateInitialConditio
     std::vector<particleAcceleration> particles;
 
     // Create the central star
-    particleAcceleration central_star(Vector3d::Zero(), Vector3d::Zero(), 1.0);
+    double mass_central = 1.0;
+    particleAcceleration central_star(Vector3d::Zero(), Vector3d::Zero(), mass_central);
     particles.push_back(central_star);
-
-    // // Set the number of particles in the system
-    // // Default num_particles = 100 adjust this value as needed
-    // int num_particles = 100;
-    std::cout << "\n" << "test: "<<seed << " "<< num_particles << std::endl;
-
 
     // Generate random particles
     for (int i = 1; i <= num_particles; ++i) {
@@ -79,42 +76,40 @@ std::vector<particleAcceleration> RandomSystemGenerator::generateInitialConditio
         Vector3d velocity ((-(1 / std::sqrt(r_i)) * cos(theta_i)), ((1 / std::sqrt(r_i)) * sin(theta_i)), 0.0);
         particleAcceleration particle(position, velocity, mass_i);
         particles.push_back(particle);
+
     }
 
     return particles;
 }
 
 sysSimulator::sysSimulator (std::shared_ptr<InitialConditionGenerator> gen) : generator(gen){
-    // std::vector<particleAcceleration> particle_list = particleListGenerator();
     std::vector<particleAcceleration> particle_list = generator->generateInitialConditions();
     addSysInput(particle_list);
+    particle_list_ = particle_list;
 }
 
 std::vector<particleAcceleration> sysSimulator::particleListGenerator (){
     
-    return generator->generateInitialConditions();
+    // return generator->generateInitialConditions();
+    return particle_list_;
 }
 
 void sysSimulator::addSysInput (std::vector<particleAcceleration>& particle_list) {
-    // for (int i = 0; i < particle_list.size(); i++){
-    //     for (int j = 0; j < particle_list.size(); j++){
-    //         if (i != j){
-    //             particle_list[i].addParticle(particle_list[j]);
-    //         }
-    //         else{
-    //             continue;
-    //         }
-    //     }
-    // }
-    for (particleAcceleration &p_i : particle_list) {
-        for (const particleAcceleration &p_j : particle_list) {
+
+    for (particleAcceleration& p_i : particle_list) {
+        for (particleAcceleration& p_j : particle_list) {
             if (&p_i != &p_j) {
                 p_i.addParticle(p_j);
             }
-            else{
-                continue;
-            }
         }
+    }
+    releaseMemoryFromParticles(particle_list);
+
+}
+
+void sysSimulator::releaseMemoryFromParticles(std::vector<particleAcceleration>& particle_list) {
+    for (particleAcceleration& p_i : particle_list) {
+        p_i.releaseMemory();
     }
 }
 
@@ -127,7 +122,7 @@ void sysSimulator::printPosition (std::vector<particleAcceleration>& particle_li
         ++i;
     }
 }
-std::vector<double> sysSimulator::kineticEnergy (std::vector<particleAcceleration> particle_list) {
+std::vector<double> sysSimulator::kineticEnergy (std::vector<particleAcceleration>& particle_list) {
     std::vector<double> kinetic_energy_list;
     for (const n_body::particleAcceleration particle : particle_list){
         double kin_energy = 0.0;
@@ -140,7 +135,7 @@ std::vector<double> sysSimulator::kineticEnergy (std::vector<particleAcceleratio
     return kinetic_energy_list_;
 }
 
-std::vector<double> sysSimulator::potentialEnergy (std::vector<particleAcceleration> particle_list) {
+std::vector<double> sysSimulator::potentialEnergy (std::vector<particleAcceleration>& particle_list) {
     std::vector<double> potential_energy_list;
     for (particleAcceleration &p_i : particle_list) {
         // initial potential energy for each particle
@@ -186,6 +181,4 @@ double sysSimulator::sumTotalEnergy (){
     sum_tot_energy_ = sum_tot_energy;
     return sum_tot_energy_;
 }
-
-
 }

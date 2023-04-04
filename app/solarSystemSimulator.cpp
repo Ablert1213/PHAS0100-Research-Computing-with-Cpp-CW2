@@ -32,18 +32,22 @@ int main(int argc, char* argv[]) {
           ++i;
         }
 
+        std::vector<n_body::particleAcceleration*> particle_ptr_list;
+        for (auto& p : particle_list) {
+            particle_ptr_list.push_back(&p);
+        }
+
         for (int timestep = 0; timestep < tot_timestpes; ++timestep){
             // Update gravitational acceleration for all bodies
-            for (n_body::particleAcceleration& p_i : particle_list){
-                p_i.sumAcceleration(particle_list);
+            for (n_body::particleAcceleration* p_i : particle_ptr_list){
+                p_i->sumAcceleration(particle_ptr_list);
             } 
 
             // Update position and velocity of each body
-            for (n_body::particleAcceleration& p_i : particle_list){
-                p_i.update(dt);
+            for (n_body::particleAcceleration* p_i : particle_ptr_list){
+                p_i->update(dt);
             }
         }
-
         std::cout << "\n" << std::endl;
         simulator.printPosition (particle_list, "Final");
         int idx = 0;

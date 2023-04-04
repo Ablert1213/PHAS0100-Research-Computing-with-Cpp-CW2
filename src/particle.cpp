@@ -3,17 +3,9 @@
 
 #include <iostream>
 
-// Particle::Particle(double in_mass) :
-//     mass{in_mass}
-//     {}
-
-// double Particle::getMass() const {
-//     return mass;
-// }
-
 namespace n_body 
 {
-Particle::Particle(const Eigen::Vector3d& position, const Eigen::Vector3d& velocity, double mass)
+Particle::Particle(const Eigen::Vector3d& position, const Eigen::Vector3d& velocity, double& mass)
     : position_ (position), velocity_ (velocity), mass_ (mass)
     {}
 
@@ -46,12 +38,9 @@ void Particle::uploadVelocity(const Eigen::Vector3d &velocity) {
     velocity_ = velocity;
 }
 
-void Particle::update(double dt) {
+void Particle::update(double& dt) {
     position_ += dt * velocity_;
-    // uploadPosition(position_);
-    // acceleration_ = getAcceleration();
     velocity_ += dt * acceleration_;
-    // uploadVelocity(velocity_);
 
 }
 

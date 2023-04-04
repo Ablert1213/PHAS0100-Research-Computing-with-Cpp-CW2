@@ -6,7 +6,7 @@
 #include <memory>
 #include <string>
 #include "acceleration.hpp"
-#pragma once
+// #pragma once
 
 using Eigen::Vector3d;
 
@@ -48,10 +48,10 @@ class sysSimulator{
         void addSysInput (std::vector<particleAcceleration>& particle_list);
 
         // calculate the kinetic energy
-        std::vector<double> kineticEnergy (std::vector<particleAcceleration> particle_list);
+        std::vector<double> kineticEnergy (std::vector<particleAcceleration>& particle_list);
 
         // calculate the potential energy
-        std::vector<double> potentialEnergy (std::vector<particleAcceleration> particle_list);
+        std::vector<double> potentialEnergy (std::vector<particleAcceleration>& particle_list);
 
         // calculate the total energy of each particle
         std::vector<double> totalEnergy ();
@@ -62,13 +62,14 @@ class sysSimulator{
         // print position value of particles in the list
         static void printPosition (std::vector<particleAcceleration>& particle_list, const std::string& label);
 
+        // release memory after the particles are added to each particleAcceleration object
+        void releaseMemoryFromParticles(std::vector<particleAcceleration>& particle_list);
     protected:
+        std::vector<particleAcceleration> particle_list_;
         std::vector<double> kinetic_energy_list_;
         std::vector<double> potential_energy_list_;
         std::vector<double> total_energy_list_;
         double sum_tot_energy_;
 };
-
-
 
 }

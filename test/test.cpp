@@ -20,8 +20,8 @@ TEST_CASE("Particle with no acceleration should move at constant velocity", "[pa
     Vector3d zero_acceleration(0, 0, 0);
 
     particle.initialAcceleration(zero_acceleration);    
-
-    particle.update(0.1);
+    double dt = 0.1;
+    particle.update(dt);
 
     REQUIRE(particle.getPosition().isApprox(Vector3d(1.4, 2.5, 3.6), 1e-6));
     REQUIRE(particle.getVelocity().isApprox(Vector3d(4, 5, 6), 1e-6));
@@ -38,8 +38,8 @@ TEST_CASE("Particle with constant acceleration should move with constant acceler
     Vector3d constant_acceleration(0, 0, 2);
 
     particle.initialAcceleration(constant_acceleration);
-
-    particle.update(0.1);
+    double dt = 0.1;
+    particle.update(dt);
 
     REQUIRE(particle.getPosition().isApprox(Vector3d(1.4, 2.5, 3.6)));
     REQUIRE(particle.getVelocity().isApprox(Vector3d(4, 5, 6.2)));
@@ -47,66 +47,69 @@ TEST_CASE("Particle with constant acceleration should move with constant acceler
 }
 
 TEST_CASE("Particle with artificial acceleration should orbit in a circle", "[particle]") {
-    Vector3d position(1, 0, 0);
-    Vector3d velocity(0, 1, 0);
+    Vector3d position(10, 0, 0);
+    Vector3d velocity(0, 10, 0);
     double mass = 10.0;
 
     n_body::Particle particle(position, velocity, mass);
+    double dt = 0.001;
+    double tot_timesteps = (2 * M_PI)/dt;
 
-    for (double t = 0; t < 2 * 3.141; t += 0.001) {
+    for (double t = 0; t < tot_timesteps; ++t) {
 
         Vector3d artificial_acceleration = -1 * particle.getPosition();
         particle.initialAcceleration(artificial_acceleration);
-        particle.update(0.001);
-    
+        particle.update(dt);
     }
-
-    REQUIRE(particle.getPosition().isApprox(Vector3d(1, 0, 0), 1e-1));
-    REQUIRE(particle.getVelocity().isApprox(Vector3d(0, 1, 0), 1e-1));
+    REQUIRE(particle.getPosition().isApprox(Vector3d(10, 0, 0), 1e-2));
+    REQUIRE(particle.getVelocity().isApprox(Vector3d(0, 10, 0), 1e-2));
     REQUIRE(particle.getMass() == 10.0);
 }
 
 TEST_CASE("Gravitational force between two particles", "[acceleration]") {
-    n_body::particleAcceleration p_i (Vector3d(0, 0, 0), Vector3d::Zero(), 1.0);
-    n_body::particleAcceleration p_j (Vector3d(1, 0, 0), Vector3d::Zero(), 1.0);
+    double mass = 0.1;
+    n_body::particleAcceleration p_i (Vector3d(0, 0, 0), Vector3d::Zero(), mass);
+    n_body::particleAcceleration p_j (Vector3d(1, 0, 0), Vector3d::Zero(), mass);
     double epsilon = 0.0;
 
-    Vector3d expectAcc (1, 0, 0); // Calculate the expected acceleration by hand
-    Vector3d calAcc = n_body::particleAcceleration::calcAcceleration(p_i, p_j, epsilon);
+    Vector3d expectAcc (0.1, 0, 0); // Calculate the expected acceleration by hand
+    Vector3d calAcc = n_body::particleAcceleration::calcAcceleration(&p_i, &p_j, epsilon);
     REQUIRE(calAcc.isApprox(expectAcc));
 }
 
 TEST_CASE("No acceleration when particle interacts with itself", "[acceleration]") {
-    n_body::particleAcceleration p1 = n_body::particleAcceleration(Eigen::Vector3d(1, 0, 0), Eigen::Vector3d::Zero(), 1.0);
-    n_body::particleAcceleration p2 = n_body::particleAcceleration(Eigen::Vector3d(1, 0, 0), Eigen::Vector3d::Zero(), 1.0);
+    double mass = 1.0;
+    n_body::particleAcceleration p1 = n_body::particleAcceleration(Eigen::Vector3d(1, 0, 0), Eigen::Vector3d::Zero(), mass);
+    n_body::particleAcceleration p2 = n_body::particleAcceleration(Eigen::Vector3d(1, 0, 0), Eigen::Vector3d::Zero(), mass);
     p1.addParticle(p2);
     
     Eigen::Vector3d expectedAcceleration = Eigen::Vector3d::Zero();
-    std::vector <n_body::particleAcceleration> particle_list = p1.getParticle();
+    std::vector <n_body::particleAcceleration*> particle_list = p1.getParticle();
 
     p1.sumAcceleration(particle_list, 1.0);
-    Eigen::Vector3d calculatedAcceleration = n_body::particleAcceleration::calcAcceleration(p1, p1, 1.0);
+    Eigen::Vector3d calculatedAcceleration = n_body::particleAcceleration::calcAcceleration(&p1, &p1, 1.0);
 
-    for (n_body::Particle &p_i : particle_list){
-        REQUIRE(p_i.getAcceleration().isApprox(expectedAcceleration));
+    for (n_body::particleAcceleration* p_i : particle_list){
+        REQUIRE(p_i->getAcceleration().isApprox(expectedAcceleration));
     }
     REQUIRE(calculatedAcceleration.isApprox(expectedAcceleration));
 
 }
 
 TEST_CASE("Zero acceleration with equal particles on either side", "[acceleration]") {
-    n_body::particleAcceleration p1 = n_body::particleAcceleration(Eigen::Vector3d(1, 0, 0), Eigen::Vector3d::Zero(), 1.0);
-    n_body::particleAcceleration p2 = n_body::particleAcceleration(Eigen::Vector3d(-1, 0, 0), Eigen::Vector3d::Zero(), 1.0);
+    double mass = 1.0;
+    n_body::particleAcceleration p1 = n_body::particleAcceleration(Eigen::Vector3d(1, 0, 0), Eigen::Vector3d::Zero(), mass);
+    n_body::particleAcceleration p2 = n_body::particleAcceleration(Eigen::Vector3d(-1, 0, 0), Eigen::Vector3d::Zero(), mass);
     p1.addParticle(p2);
     
     Eigen::Vector3d expectedAcceleration = Eigen::Vector3d::Zero();
-    std::vector <n_body::particleAcceleration> particle_list = p1.getParticle();
+    std::vector <n_body::particleAcceleration*> particle_list = p1.getParticle();
 
     p1.sumAcceleration(particle_list, 1.0);
-    Eigen::Vector3d calculatedAcceleration = n_body::particleAcceleration::calcAcceleration(p1, p1, 1.0);
+    Eigen::Vector3d calculatedAcceleration = n_body::particleAcceleration::calcAcceleration(&p1, &p1, 1.0);
 
-    for (n_body::Particle &p_i : particle_list){
-        REQUIRE(p_i.getAcceleration().isApprox(expectedAcceleration));
+    for (n_body::particleAcceleration* p_i : particle_list){
+        REQUIRE(p_i->getAcceleration().isApprox(expectedAcceleration));
     }
 }
 

@@ -8,7 +8,7 @@ namespace n_body
 
 class Particle{
     public:
-        Particle(const Eigen::Vector3d& position, const Eigen::Vector3d& velocity, double mass);
+        Particle(const Eigen::Vector3d& position, const Eigen::Vector3d& velocity, double& mass);
         
         Eigen::Vector3d getPosition() const;
         Eigen::Vector3d getVelocity() const;
@@ -18,7 +18,7 @@ class Particle{
         void initialAcceleration (const Eigen::Vector3d& acceleration);
         void uploadPosition(const Eigen::Vector3d& position);
         void uploadVelocity(const Eigen::Vector3d& velocity);
-        void update(double dt);
+        void update(double& dt);
 
     protected:
         Eigen::Vector3d position_;
