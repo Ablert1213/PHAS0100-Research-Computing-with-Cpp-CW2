@@ -52,6 +52,12 @@ You should fill in the instructions for using the app here.
 
 This project is maintained by Dr. Jamie Quinn as part of UCL ARC's course, Research Computing in C++.
 
+## 1.3.e Building the Solar System.
+
+Choose a suitably small dt (timestep) and simulate the system for 1 full year (a time of 2π). The output copy:![Alt text](OutputCopy/1_3_e_outputCopy.png)
+Observed from the output, the Earth's positions returns to close to its original position after a time of 2π.
+
+
 ## 2.1 Calculating numerical energy loss results summarizes.
 
 In summary, the total energy drop over a single simulation run varies depending on the time step (dt) used in the simulation. As the time step increases, the simulation becomes less accurate in general, and more energy is lost.
@@ -133,18 +139,20 @@ And with the increase in the number of particles, the total time and average tim
 ## 2.4 Parallelising with OpenMP
 
 ### a.
-At the beginning, I parallelise the two for-loops in the 'solarSystemSimulator.cpp' for updating accelerations and position/velocities. Simply use '#pragma omp parallel for' directive.
-The simulator with timestep 0.003, softening factor 0.001 and 2048 number of particles, the total time drop from 3.16945 mins (Average time per timestep: 0.0907981 seconds) to 0.914399 mins (Average time per timestep: 0.0261956 seconds), it gets 71% quicker (significant improvement) than the one without parllelising (I take this as benchmark for below experiments). 
+
+1. At the beginning, I parallelise the two for-loops in the 'solarSystemSimulator.cpp' for updating accelerations and position/velocities. Simply use '#pragma omp parallel for' directive.
+The simulator run for 1 year with timestep 0.003, softening factor 0.001 and 2048 number of particles, the total time drop from 3.16945 mins (Average time per timestep: 0.0907981 seconds) to 0.914399 mins (Average time per timestep: 0.0261956 seconds), it gets 71% quicker (significant improvement) than the one without parllelising (I take this as benchmark for below experiments). 
 
 ##### Experiment with the collapse and schedule clauses and comment on the performance differences.
-1. I parallelise the loops that involve adding particles 'void sysSimulator::addSysInput' function by using '#pragma omp parallel for schedule(dynamic) collapse(1)' directive. The simulator with timestep 0.003, softening factor 0.001 and 2048 number of particles, the total time drop from 0.914399 mins (Average time per timestep: 0.0261956 seconds) to 0.79011 mins (Average time per timestep: 0.022635 seconds), it gets 14% quicker than the experiment before without parllelising. 
-2. The next experiment, I parallelize the loops that involve computing the sum of total energy 'double sysSimulator::sumTotalEnergy' function by using '#pragma omp parallel for reduction(+:sum_tot_energy)' directive. The simulator with timestep 0.003, softening factor 0.001 and 2048 number of particles, the total time increases from 0.79011 mins (Average time per timestep: 0.022635 seconds) to 0.932914 mins (Average time per timestep: 0.026726 seconds).  
-3. Moreover, I parallelise the loop that involves the calculation of the sum of accelerations 'void particleAcceleration::sumAcceleration' function by using '#pragma omp parallel for schedule(dynamic) reduction(+:sumAcceleration_i)' directive.The simulator with timestep 0.003, softening factor 0.001 and 2048 number of particles, the total time increases from 0.932914 mins (Average time per timestep: 0.026726 seconds) to 1.45148 mins (Average time per timestep: 0.0415817 seconds).
-Both experiment 2 and 3 get worse performance, which could be these following reasons: It may because the problem size is not large enough the overhead might overshadow the potential speedup obtained from parallelization. And it could be the parallelisation strategy does not efficiently utilize the available resources and does not effectively reduce the problem size, therefore the performance might get worse.
-Therefore, in this part I keep the code only with the change made in experiment 1.
+2. I parallelise the loops that involve adding particles 'void sysSimulator::addSysInput' function by using '#pragma omp parallel for schedule(dynamic) collapse(1)' directive. The simulator with timestep 0.003, softening factor 0.001 and 2048 number of particles, the total time drop from 0.914399 mins (Average time per timestep: 0.0261956 seconds) to 0.79011 mins (Average time per timestep: 0.022635 seconds), it gets 14% quicker than the experiment before without parllelising. 
+3. After that, for 'std::vector<double> sysSimulator::kineticEnergyPara' and 'std::vector<double> sysSimulator::potentialEnergyPara' function I use OpenMP's '#pragma omp parallel' directive to create a parallel region where the workload is divided among all cores. And I parallelized the loop by using '#pragma omp for'. Theoretically, the program should take the advantage of multi-cores processors and speedup the performance. However, the total time increases from 0.79011 mins (Average time per timestep: 0.022635 seconds) to 1.02161 mins (Average time per timestep: 0.0292669 seconds). 
+4. The next experiment, I turn off the parallelisations from experiment 2, and parallelisated the loops that involve computing the sum of total energy 'double sysSimulator::sumTotalEnergy' function by using '#pragma omp parallel for reduction(+:sum_tot_energy)' directive. The simulator with timestep 0.003, softening factor 0.001 and 2048 number of particles, the total time increases from 0.79011 mins (Average time per timestep: 0.022635 seconds) to 0.932914 mins (Average time per timestep: 0.026726 seconds).  
+5. Moreover, I parallelise the loop that involves the calculation of the sum of accelerations 'void particleAcceleration::sumAcceleration' function by using '#pragma omp parallel for schedule(dynamic) reduction(+:sumAcceleration_i)' directive.The simulator with timestep 0.003, softening factor 0.001 and 2048 number of particles, the total time increases from 0.932914 mins (Average time per timestep: 0.026726 seconds) to 1.45148 mins (Average time per timestep: 0.0415817 seconds).
+6. In this experiment I turn all above parallelisations on. The simulator with timestep 0.003, softening factor 0.001 and 2048 number of particles, the total time increases from 1.45148 mins (Average time per timestep: 0.0415817 seconds) to 1.89858 mins (Average time per timestep: 0.0543902 seconds). All experiment 3, 4 and 5 receive worse performance, which could be these following reasons: It may because the problem size is not large enough the overhead might overshadow the potential speedup obtained from parallelization. And it could be the parallelisation strategy does not efficiently utilize the available resources and does not effectively reduce the problem size, therefore the performance might get worse.
+Due to the limitation of the laptop, I can not simulate with really large particles number. But after several benchmarking, implementing different parallelisations strategies and measuring each of the execution time in this part. I keep the code only with the parallelistion strategies made in experiment 1 and 2.
 
 ### b.
-In the part, I compiled the code with the optimization level set to -O2 as benchmark.
+In the part, I compiled the code with the optimization level set to -O2, and the parallelistion strategy decided in (a.) as benchmark.
 
 For the Strong Scaling Experiment, I run the simulations with different thread counts, starting form 1 and increasing up to the number 10. The runtime with a single thread is larger than 30 seconds.
   | 'OMP_NUM_THREADS' | Time(<units>) | Speedup |
