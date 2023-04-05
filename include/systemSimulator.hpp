@@ -50,6 +50,9 @@ class sysSimulator{
         // calculate the kinetic energy
         std::vector<double> kineticEnergy (std::vector<particleAcceleration>& particle_list);
 
+        // calculate the potential energy and parallelise the calculation using OpenMp
+        std::vector<double> kineticEnergyPara (std::vector<particleAcceleration>& particle_list);
+
         // calculate the potential energy
         std::vector<double> potentialEnergy (std::vector<particleAcceleration>& particle_list);
 

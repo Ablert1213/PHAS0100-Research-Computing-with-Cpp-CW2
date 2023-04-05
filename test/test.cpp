@@ -137,7 +137,7 @@ TEST_CASE("Solar System particles list Generator", "[generator]"){
     }
 }
 
-TEST_CASE("Testing calculation with OpenMP parallelization", "[tot]") {
+TEST_CASE("Testing total energy calculation with OpenMP parallelization", "[parallelization]") {
     int num_particles = 8;
     int seed = 42;
     n_body::sysSimulator simulator = n_body::sysSimulator(std::make_shared<n_body::RandomSystemGenerator>(seed, num_particles));
@@ -154,15 +154,19 @@ TEST_CASE("Testing calculation with OpenMP parallelization", "[tot]") {
 
 }
 
-TEST_CASE("Testing calculation with OpenMP parallelization", "[parallelization]") {
+TEST_CASE("Testing kinetic and potential energy calculation with OpenMP parallelization", "[parallelization]") {
     int num_particles = 8;
     int seed = 42;
     n_body::sysSimulator simulator = n_body::sysSimulator(std::make_shared<n_body::RandomSystemGenerator>(seed, num_particles));
     std::vector<n_body::particleAcceleration> particle_list = simulator.particleListGenerator();
 
+    std::vector<double> kinetic_energy_list_final = simulator.kineticEnergy(particle_list);
+    std::vector<double> kinetic_energy_list_final_para = simulator.kineticEnergyPara(particle_list); // with parallelisition
+
     std::vector<double> potential_energy_list_final = simulator.potentialEnergy(particle_list);
     std::vector<double> potential_energy_list_final_para = simulator.potentialEnergyPara(particle_list); // with parallelisition
     for (int i = 0; i < potential_energy_list_final.size(); ++i){
         REQUIRE(potential_energy_list_final[i] == Approx(potential_energy_list_final_para[i]));
+        REQUIRE(kinetic_energy_list_final[i] == Approx(kinetic_energy_list_final_para[i]));
     }
 }

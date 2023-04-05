@@ -137,6 +137,32 @@ std::vector<double> sysSimulator::kineticEnergy (std::vector<particleAcceleratio
     return kinetic_energy_list_;
 }
 
+std::vector<double> sysSimulator::kineticEnergyPara (std::vector<particleAcceleration>& particle_list) {
+    std::vector<double> kinetic_energy_list(particle_list.size(), 0.0);
+
+    #pragma omp parallel
+    {
+        std::vector<double> local_kinetic_energy_list(particle_list.size(), 0.0);
+
+        #pragma omp for
+        for (int i = 0; i < particle_list.size(); ++i) {
+            double kin_energy = 0.0;
+            double mass = particle_list[i].getMass();
+            Eigen::Vector3d velocity = particle_list[i].getVelocity();
+            kin_energy = 0.5 * mass * velocity.squaredNorm();
+            local_kinetic_energy_list[i] = kin_energy;
+        }
+
+        #pragma omp critical
+        for (int i = 0; i < particle_list.size(); ++i) {
+            kinetic_energy_list[i] += local_kinetic_energy_list[i];
+        }
+    }
+
+    kinetic_energy_list_ = kinetic_energy_list;
+    return kinetic_energy_list_;
+}
+
 std::vector<double> sysSimulator::potentialEnergy (std::vector<particleAcceleration>& particle_list) {
     std::vector<double> potential_energy_list;
     for (particleAcceleration &p_i : particle_list) {
@@ -163,6 +189,7 @@ std::vector<double> sysSimulator::potentialEnergy (std::vector<particleAccelerat
 }
 
 std::vector<double> sysSimulator::potentialEnergyPara(std::vector<particleAcceleration>& particle_list) {
+
     std::vector<double> potential_energy_list(particle_list.size(), 0.0);
 
     #pragma omp parallel
