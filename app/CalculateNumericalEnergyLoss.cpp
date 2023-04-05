@@ -3,7 +3,10 @@
 #include <chrono>
 #include "systemSimulator.hpp"
 
+// Main function for simulating the solar system
 int main(int argc, char* argv[]) {
+
+    // Display help message if no arguments are provided or help flag is used
     if (argc == 1 || std::string(argv[1]) == "-h" || std::string(argv[1]) == "--help"){
         std::cout << "Usage: solarSystemSimulator [options]" << "\n";
         std::cout << "Options:" << "\n";
@@ -16,12 +19,14 @@ int main(int argc, char* argv[]) {
     }
 
     else{
+
+        // Parse command line arguments for timestep and simulation length
         double dt = std::atof(argv[1]);
         double len_time = std::atof(argv[2]);
         double tot_timestpes = len_time * ((2 * M_PI)/dt);
 
+        // Initialize the simulator with the solar system generator
         n_body::sysSimulator simulator = n_body::sysSimulator(std::make_shared<n_body::SolarSystemGenerator>());
-        // n_body::sysSimulator simulator = n_body::sysSimulator();
         std::vector<n_body::particleAcceleration> particle_list = simulator.particleListGenerator();
         std::vector<double> kinetic_energy_list = simulator.kineticEnergy(particle_list);
         std::vector<double> potential_energy_list = simulator.potentialEnergy(particle_list);
@@ -68,7 +73,6 @@ int main(int argc, char* argv[]) {
         double avg_time_per_timestep = total_time / tot_timestpes;
         std::cout << "\n" <<"Total time: " << total_time/60 << " mins" << std::endl;
         std::cout << "Average time per timestep: " << avg_time_per_timestep << " seconds" << std::endl;
-
         std::cout << std::endl;
         std::cout << "Final Energy: " << std::endl;
         for (int i = 0; i < total_energy_list.size(); ++i) {
