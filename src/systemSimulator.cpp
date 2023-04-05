@@ -15,19 +15,21 @@ using Eigen::Vector3d;
 namespace n_body
 {
 
+// Generate initial conditions for solar system
 std::vector<particleAcceleration> SolarSystemGenerator::generateInitialConditions() {
+
     // inital data
     std::vector<double> masses = {1., 1./6023600, 1./408524, 1./332946.038, 1./3098710, 1./1047.55, 1./3499, 1./22962, 1./19352};
     std::vector<double> distances = {0.0, 0.4, 0.7, 1, 1.5, 5.2, 9.5, 19.2, 30.1};
+
     // generates random angle sigma for each of the planets 
-    // std::random_device rd;
     int seed = 42; // have a fixed seed value that allows to reproduce results consistently
     std::mt19937 gen(seed);
     std::uniform_real_distribution<double> randomly_theta (0, 2 * M_PI);
     
     std::vector<particleAcceleration> solar_system;
-
     for (int i = 0; i < masses.size(); ++i) {
+
         // initial the first sun input
         if (i == 0) {
             Vector3d position = Vector3d::Zero();
@@ -36,6 +38,7 @@ std::vector<particleAcceleration> SolarSystemGenerator::generateInitialCondition
             particleAcceleration planet_i = particleAcceleration (position, velocity, mass_sun);
             solar_system.push_back(planet_i);
         }
+        
         else{
             double theta_i = randomly_theta(gen);
             double mass_i = masses[i];
@@ -51,9 +54,12 @@ std::vector<particleAcceleration> SolarSystemGenerator::generateInitialCondition
     return solar_system;
 }
 
+// Constructor for random system generator
 RandomSystemGenerator::RandomSystemGenerator(int seed, int num_particles): seed(seed), num_particles(num_particles) {}
 
+// Generate initial conditions for random system
 std::vector<particleAcceleration> RandomSystemGenerator::generateInitialConditions() {
+
     // Implement random initial conditions generation
     std::mt19937 gen(seed);
     std::uniform_real_distribution<double> mass_distribution(1.0 / 6000000, 1.0 / 1000);
@@ -77,27 +83,28 @@ std::vector<particleAcceleration> RandomSystemGenerator::generateInitialConditio
         Vector3d velocity ((-(1 / std::sqrt(r_i)) * cos(theta_i)), ((1 / std::sqrt(r_i)) * sin(theta_i)), 0.0);
         particleAcceleration particle(position, velocity, mass_i);
         particles.push_back(particle);
-
     }
-
     return particles;
 }
 
+// Constructor for system simulator
 sysSimulator::sysSimulator (std::shared_ptr<InitialConditionGenerator> gen) : generator(gen){
     std::vector<particleAcceleration> particle_list = generator->generateInitialConditions();
     addSysInput(particle_list);
     particle_list_ = particle_list;
 }
 
+// Generate particle list using initial condition generator
 std::vector<particleAcceleration> sysSimulator::particleListGenerator (){
-    
-    // return generator->generateInitialConditions();
-    return particle_list_;
+        return particle_list_;
 }
 
+// Add input data to particle list for calculations
 void sysSimulator::addSysInput (std::vector<particleAcceleration>& particle_list) {
 
+    // developer can comment/uncomment the code below to parallelised the loop
     #pragma omp parallel for schedule(dynamic) collapse(1)
+    
     for (particleAcceleration& p_i : particle_list) {
         for (particleAcceleration& p_j : particle_list) {
             if (&p_i != &p_j) {
@@ -109,12 +116,14 @@ void sysSimulator::addSysInput (std::vector<particleAcceleration>& particle_list
 
 }
 
+// Release memory after particles have been added to particleAcceleration objects
 void sysSimulator::releaseMemoryFromParticles(std::vector<particleAcceleration>& particle_list) {
     for (particleAcceleration& p_i : particle_list) {
         p_i.releaseMemory();
     }
 }
 
+// Print particle positions
 void sysSimulator::printPosition (std::vector<particleAcceleration>& particle_list, const std::string& label){
     std::cout << label << " positions:" << std::endl;
     std::vector<std::string> planet {"sun", "Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune"};
@@ -124,6 +133,8 @@ void sysSimulator::printPosition (std::vector<particleAcceleration>& particle_li
         ++i;
     }
 }
+
+// Calculate kinetic energy for all particles
 std::vector<double> sysSimulator::kineticEnergy (std::vector<particleAcceleration>& particle_list) {
     std::vector<double> kinetic_energy_list;
     for (const n_body::particleAcceleration particle : particle_list){
@@ -137,6 +148,7 @@ std::vector<double> sysSimulator::kineticEnergy (std::vector<particleAcceleratio
     return kinetic_energy_list_;
 }
 
+// calculate the potential energy and parallelise the calculation using OpenMp
 std::vector<double> sysSimulator::kineticEnergyPara (std::vector<particleAcceleration>& particle_list) {
     std::vector<double> kinetic_energy_list(particle_list.size(), 0.0);
 
@@ -163,6 +175,7 @@ std::vector<double> sysSimulator::kineticEnergyPara (std::vector<particleAcceler
     return kinetic_energy_list_;
 }
 
+// Calculate potential energy for all particles
 std::vector<double> sysSimulator::potentialEnergy (std::vector<particleAcceleration>& particle_list) {
     std::vector<double> potential_energy_list;
     for (particleAcceleration &p_i : particle_list) {
@@ -188,6 +201,7 @@ std::vector<double> sysSimulator::potentialEnergy (std::vector<particleAccelerat
     return potential_energy_list_;
 }
 
+// Calculate potential energy in parallel using OpenMP
 std::vector<double> sysSimulator::potentialEnergyPara(std::vector<particleAcceleration>& particle_list) {
 
     std::vector<double> potential_energy_list(particle_list.size(), 0.0);
@@ -220,7 +234,7 @@ std::vector<double> sysSimulator::potentialEnergyPara(std::vector<particleAccele
     return potential_energy_list_;
 }
 
-
+// Calculate total energy for all particles
 std::vector<double> sysSimulator::totalEnergy (){
     std::vector<double> total_energy_list;
     for (int i = 0; i < kinetic_energy_list_.size(); ++i){
@@ -234,6 +248,7 @@ std::vector<double> sysSimulator::totalEnergy (){
     return total_energy_list_;
 }
 
+// Calculate sum of all individual particle energies
 double sysSimulator::sumTotalEnergy (){
     double sum_tot_energy = 0.0;
     for (int i = 0; i < total_energy_list_.size(); ++i){
@@ -243,6 +258,7 @@ double sysSimulator::sumTotalEnergy (){
     return sum_tot_energy_;
 }
 
+// Calculate sum of all individual particle energies in parallel using OpenMP
 double sysSimulator::sumTotalEnergyPara (){
     double sum_tot_energy = 0.0;
     #pragma omp parallel for reduction(+:sum_tot_energy)
