@@ -56,7 +56,7 @@ This project is maintained by Dr. Jamie Quinn as part of UCL ARC's course, Resea
 
 Choose a suitably small dt (timestep) and simulate the system for 1 full year (a time of 2π). This task can be solved by running the command line as:
 ```
-build/solarSystemSimulator <timestep_dt> <num_years>
+$ build/solarSystemSimulator <timestep_dt> <num_years>
 ``` 
 The output copy:![Alt text](OutputCopy/1_3_e_outputCopy.png)
 Observed from the output, the Earth's positions returns to close to its original position after a time of 2π.
@@ -66,7 +66,7 @@ Observed from the output, the Earth's positions returns to close to its original
 
 In summary, the total energy drop over a single simulation run varies depending on the time step (dt) used in the simulation. As the time step increases, the simulation becomes less accurate in general, and more energy is lost. This task can be solved by running the command line as:
 ```
-build/solarSystemSimulator2 <timestep_dt> <num_years>
+$ build/solarSystemSimulator2 <timestep_dt> <num_years>
 ```
 
 Here are the summarized results (run for 100 years) for each run:
@@ -86,14 +86,14 @@ As seen from the results, the energy drop becomes larger when dt is larger, indi
 
 Run the simulation with compiler optimizations:
 ```
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="-O2"
-cmake --build build
+$ cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="-O2"
+$ cmake --build build
 ```
 
 Run the simulation without compiler optimizations:
 ```
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="-O0"
-cmake --build build
+$ cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="-O0"
+$ cmake --build build
 ```
 Based on the performance, the difference with and without complier optimizations is quite significant. With compiler optimizations enabled (using -O2), the average time per timestep remains relatively constant which are ranged from 1.46544e-06 to 1.63359e-06 seconds. However, without compiler optimizations (using -O0), the average time per timestep is much higher, at 5.74133e-05 seconds. So, in this case with same '0.001 100' input, the simulation without complier optimizations ran 0.60123 mins in total which is way more longer than the simulation using -O2 (0.0153516 mins in total).
 In terms of accuracy, the total energy drop decreases as the timestep size decreases. To strike a balance between simulation run time and accuracy, a timestep size of 0.001 could be a good choice. With this timestep, the total time is 0.0153516 minutes, and the total energy drop is around -2.31664%. Compared with timestep size of 0.004 the energy drop decreased 53%, and compared with timestep size of 0.0008 the energy drop only less 10%. Which indicates this provides a reasonable simulation run time while maintaining an acceptable level of accuracy. However, under 'a few minutes is reasonable' condition, with timestep 0.00001, it gets -0.103798% of total energy drop after 1.688 minute.
@@ -102,7 +102,7 @@ In terms of accuracy, the total energy drop decreases as the timestep size decre
 
 With timestep(dt) equal to 0.001 and softening acceleration calculation equal to 0.001 after 1 year (2π time). This task can be solved by running the command line as:
 ```
-build/solarSystemSimulator3 <timestep_dt> <num_years> <softening_factor_epsilon>
+$ build/solarSystemSimulator3 <timestep_dt> <num_years> <softening_factor_epsilon>
 ```
 The performance of the solar system simulator for each case is as follows:
 
@@ -161,15 +161,11 @@ The simulator run for 1 year with timestep 0.003, softening factor 0.001 and 204
 Due to the limitation of the laptop, I can not simulate with really large particles number. But after several benchmarking, implementing different parallelisations strategies and measuring each of the execution time in this part. I keep the code only with the parallelistion strategies made in experiment 1 and 2.
 
 ### b.
-In the part, I compiled the code with the optimization level set to -O2, and the parallelistion strategy decided in (a.) as benchmark. This task can be solved by running the command line as:
-```
-for n in 1 2 3 4 5 6 7 8; do OMP_NUM_THREADS=$n ./build/solarSystemSimulator3 0.003 1 0.001 2048; done
-```
-And for both experiments, the simulator run for 1 year with timestep 0.003, softening factor 0.001.
+In the part, I compiled the code with the optimization level set to -O2, and the parallelistion strategy decided in (a.) as benchmark. And for both experiments, the simulator run for 1 year with timestep 0.003, softening factor 0.001. The runtime with a single thread is larger than 30 seconds in both experiments.
   
-For the Strong Scaling Experiment, I run the simulations with different thread counts, starting form 1 and increasing up to the number 10 and with certain <num_particles> = 2048. The runtime with a single thread is larger than 30 seconds. Running simulation with:
+For the Strong Scaling Experiment, I run the simulations with different thread counts, starting form 1 and increasing up to the number 8 and with certain <num_particles> = 2048. Running simulation with:
 ```
-OMP_NUM_THREADS= <num_threads> ./build/solarSystemSimulator3 0.003 1 0.001 2048
+$ for n in 1 2 3 4 5 6 7 8; do OMP_NUM_THREADS=$n ./build/solarSystemSimulator3 0.003 1 0.001 2048; done
 ```
   | 'OMP_NUM_THREADS' | Time(<units>) | Speedup |
   |---|---|---|
