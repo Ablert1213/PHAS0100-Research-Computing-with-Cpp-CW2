@@ -54,13 +54,20 @@ This project is maintained by Dr. Jamie Quinn as part of UCL ARC's course, Resea
 
 ## 1.3.e Building the Solar System.
 
-Choose a suitably small dt (timestep) and simulate the system for 1 full year (a time of 2π). The output copy:![Alt text](OutputCopy/1_3_e_outputCopy.png)
+Choose a suitably small dt (timestep) and simulate the system for 1 full year (a time of 2π). This task can be solved by running the command line as:
+```
+build/solarSystemSimulator <timestep_dt> <num_years>
+``` 
+The output copy:![Alt text](OutputCopy/1_3_e_outputCopy.png)
 Observed from the output, the Earth's positions returns to close to its original position after a time of 2π.
 
 
 ## 2.1 Calculating numerical energy loss results summarizes.
 
-In summary, the total energy drop over a single simulation run varies depending on the time step (dt) used in the simulation. As the time step increases, the simulation becomes less accurate in general, and more energy is lost.
+In summary, the total energy drop over a single simulation run varies depending on the time step (dt) used in the simulation. As the time step increases, the simulation becomes less accurate in general, and more energy is lost. This task can be solved by running the command line as:
+```
+build/solarSystemSimulator2 <timestep_dt> <num_years>
+```
 
 Here are the summarized results (run for 100 years) for each run:
 
@@ -93,8 +100,10 @@ In terms of accuracy, the total energy drop decreases as the timestep size decre
 
 ## 2.3 Increasing the scale of the system
 
-With timestep(dt) equal to 0.001 and softening acceleration calculation equal to 0.001 after 1 year (2π time).
-
+With timestep(dt) equal to 0.001 and softening acceleration calculation equal to 0.001 after 1 year (2π time). This task can be solved by running the command line as:
+```
+build/solarSystemSimulator3 <timestep_dt> <num_years> <softening_factor_epsilon>
+```
 The performance of the solar system simulator for each case is as follows:
 
 1. 8 initial particles:
@@ -152,9 +161,16 @@ The simulator run for 1 year with timestep 0.003, softening factor 0.001 and 204
 Due to the limitation of the laptop, I can not simulate with really large particles number. But after several benchmarking, implementing different parallelisations strategies and measuring each of the execution time in this part. I keep the code only with the parallelistion strategies made in experiment 1 and 2.
 
 ### b.
-In the part, I compiled the code with the optimization level set to -O2, and the parallelistion strategy decided in (a.) as benchmark.
-
-For the Strong Scaling Experiment, I run the simulations with different thread counts, starting form 1 and increasing up to the number 10. The runtime with a single thread is larger than 30 seconds.
+In the part, I compiled the code with the optimization level set to -O2, and the parallelistion strategy decided in (a.) as benchmark. This task can be solved by running the command line as:
+```
+for n in 1 2 3 4 5 6 7 8; do OMP_NUM_THREADS=$n ./build/solarSystemSimulator3 0.003 1 0.001 2048; done
+```
+And for both experiments, the simulator run for 1 year with timestep 0.003, softening factor 0.001.
+  
+For the Strong Scaling Experiment, I run the simulations with different thread counts, starting form 1 and increasing up to the number 10 and with certain <num_particles> = 2048. The runtime with a single thread is larger than 30 seconds. Running simulation with:
+```
+OMP_NUM_THREADS= <num_threads> ./build/solarSystemSimulator3 0.003 1 0.001 2048
+```
   | 'OMP_NUM_THREADS' | Time(<units>) | Speedup |
   |---|---|---|
   | 1 | 2.92736 mins |-------|
@@ -165,29 +181,22 @@ For the Strong Scaling Experiment, I run the simulations with different thread c
   | 6 | 1.06746 mins | 2.74x |
   | 7 | 1.05932 mins | 2.76x |
   | 8 | 1.05127 mins | 2.78x |
-  | 9 | 1.04113 mins | 2.81x |
-  | 10 | 0.98229 mins | 2.98x |
 
-The strong scaling experiment shows that as the number of threads increases, the overall execution time decreases, and the speedup factor increases. This is expected, as the workload is divided among more threads, allowing the computation to be completed more quickly. However, the speedup does not scale linearly with the number of threads (the idea scaling or perfect scaling in a strong scaling experiment would be a linear improvement). For instance, going from 1 to 2 threads results in a 1.78x speedup, and going from 1 to 10 threads results in a 2.98x speedup. This indicates that there are diminishing returns as more threads are added.
+The strong scaling experiment shows that as the number of threads increases, the overall execution time decreases, and the speedup factor increases. This is expected, as the workload is divided among more threads, allowing the computation to be completed more quickly. However, the speedup does not scale linearly with the number of threads (the idea scaling or perfect scaling in a strong scaling experiment would be a linear improvement). For instance, going from 1 to 2 threads results in a 1.78x speedup, and going from 1 to 8 threads results in a 2.78x speedup. This indicates that there are diminishing returns as more threads are added.
 
- For the weak scaling experiment, I run the simulations with the same thread counts as in the strong scaling experiment, but increase the number of particles proportionally to the number of threads. (In this case, I choose to start at 256 and increase 256 particles each time)
+For the weak scaling experiment, I run the simulations with the same thread counts as in the strong scaling experiment, but increase the number of particles proportionally to the number of threads. (In this case, I choose to start at 768 and increase 768 particles each time). Running simulation with:
+```
+particles=(768 1536 2304 3072 3840 4608 5376 6144); index=0; for n in 1 2 3 4 5 6 7 8; do OMP_NUM_THREADS=$n ./build/solarSystemSimulator3 0.003 1 0.001 ${particles[index]}; index=$((index+1)); done
+```
   | 'OMP_NUM_THREADS' | Num Particles | Time(<units>) | Speedup |
   |---|---|---|---|
-  | 1  | 256  | 0.0443601 mins |--------|
-  | 2  | 512  | 0.0922988 mins | 0.480x |
-  | 3  | 768  | 0.1423420 mins | 0.310x |
-  | 4  | 1024 | 0.2346730 mins | 0.190x |
-  | 5  | 1280 | 0.4532300 mins | 0.098x |
-  | 6  | 1536 | 0.6100640 mins | 0.072x |
-  | 7  | 1792 | 0.8772010 mins | 0.050x |
-  | 8  | 2048 | 1.1778400 mins | 0.038x |
-  | 9  | 2304 | 1.2501600 mins | 0.035x |
-  | 10 | 2560 | 1.6581000 mins | 0.027x |
+  | 1  | 768  | 0.40972 mins |--------|
+  | 2  | 1536 | 1.07313 mins | 0.382x |
+  | 3  | 2304 | 1.94924 mins | 0.210x |
+  | 4  | 3072 | 2.83431 mins | 0.145x |
+  | 5  | 3840 | 4.85071 mins | 0.084x |
+  | 6  | 4608 | 6.49706 mins | 0.063x |
+  | 7  | 5376 | 8.25128 mins | 0.049x |
+  | 8  | 6144 | 10.3054 mins | 0.039x |
 
-The weak scaling experiment demonstrates that as the number of threads and the problem size (number of particles) both increase, the execution time increases, and the speedup factor decreases. This result is expected, as the workload grows proportionally with the number of threads, and there is a constant amount of work per thread. However, the speedup factor decreases more quickly than expected (In a perfectly weak scaling code, the speedup should be exactly 1 with any number of threads), suggesting that the performance might not scale well with the problem size.
-
-
-
-
-
-
+The weak scaling experiment demonstrates that as the number of threads and the problem size (number of particles) both increase, the execution time increases, and the speedup factor decreases. This result is expected, as the workload grows proportionally with the number of threads, and there is a constant amount of work per thread. However, the speedup factor decreases more quickly than expected suggesting that the performance might not scale well with the problem size. For an ideal weak scaling, the execution time should remain roughly constant as the number of particles and threads increase proportionally, which meaning that the workload per thread stays constant. In such cases, the speedup factor would likely deviate from 1 because the performance scales with the square of the number of particles.
