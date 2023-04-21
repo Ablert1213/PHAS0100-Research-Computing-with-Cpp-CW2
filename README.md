@@ -52,6 +52,52 @@ You should fill in the instructions for using the app here.
 
 This project is maintained by Dr. Jamie Quinn as part of UCL ARC's course, Research Computing in C++.
 
+## Command Line App Usage Instruction
+
+### 'solarSystemSimulator' command line app
+
+First one 'solarSystemSimulator', it accepts 'dt' and 'total_num_years' as input arguments.
+```
+$ build/solarSystemSimulator <timestep_dt> <num_years>
+``` 
+And it will return the initial positions and final positions (after simulating the system for input number of years) of 9 planets in the solar system.
+
+Example of this app(simulate system under 0.01 timestep for 1 full year) being used:
+![Alt text](OutputCopy/solarSystemSimulator_Example.png)
+
+### 'solarSystemSimulator2' command line app
+
+Second one 'solarSystemSimulator2', it accepts 'dt' and 'total_num_years' as input arguments.
+```
+$ build/solarSystemSimulator2 <timestep_dt> <num_years>
+``` 
+And it will return the initial energy calculation, final energy calculation and running time of the simulator(after simulating the system for input number of years) of 9 planets in the solar system. Both initial and final energy outputs will include 'kinetic energy', 'potential energy' and 'total energy' for each particles. And 'sum of total energy', 'energy drop' to summarize at the beginning and the end.
+
+Example of this app(simulate system under 0.01 timestep for 1 full year) being used:
+![Alt text](OutputCopy/solarSystemSimulator2_Example.png)
+
+### 'solarSystemSimulator3' command line app
+
+The last one 'solarSystemSimulator3', it accepts 'dt', 'total_num_years', 'softening factor' and optional 'number of random initial particles' as input arguments.
+
+Without 'number of random initial particles' argument:
+```
+$ build/solarSystemSimulator3 <timestep_dt> <num_years> <softening_factor_epsilon>
+``` 
+And it will return final 'sum of total energy', 'energy drop', 'Total time' and 'Average time per timestep' of a list of number of initial particles {8, 64, 256, 1024, 2048}.
+
+Example of this app(simulate system under 0.01 timestep for 1 full year with 0.001 softening factor epsilon) being used:
+![Alt text](OutputCopy/solarSystemSimulator3_Example1.png)
+
+with 'number of random initial particles' argument:
+```
+$ build/solarSystemSimulator3 <timestep_dt> <num_years> <softening_factor_epsilon> <num_particles>
+``` 
+And it will return final 'sum of total energy', 'energy drop', 'Total time' and 'Average time per timestep' of given number of initial particles.
+
+Example of this app(simulate system under 0.01 timestep for 1 full year with 0.001 softening factor epsilon and 1024 initial particles) being used:
+![Alt text](OutputCopy/solarSystemSimulator3_Example2.png)
+
 ## 1.3.e Building the Solar System.
 
 Choose a suitably small dt (timestep) and simulate the system for 1 full year (a time of 2π). This task can be solved by running the command line as:
